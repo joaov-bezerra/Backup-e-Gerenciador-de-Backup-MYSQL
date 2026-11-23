@@ -1,0 +1,240 @@
+@echo off
+setlocal EnableDelayedExpansion
+color 0f
+
+title Backup MySQL 
+
+:: =========================================================
+:: CONFIGURACOES
+:: =========================================================
+
+set "backupDir1=C:\backup"
+
+set "mysqldump=C:\Program Files\MySQL\MySQL Server 5.7\bin\mysqldump.exe"
+
+set "mysqlConfig=c:\onde vai ficar o arquivo mysql.cnf"
+
+:: =========================================================
+:: DATA E HORA
+:: =========================================================
+
+set "data=%date:~6,4%%date:~3,2%%date:~0,2%"
+set "hora=%time:~0,2%%time:~3,2%"
+set "hora=%hora: =0%"
+
+:: =========================================================
+:: BACKUP 1 - 
+:: =========================================================
+
+cls
+
+echo.
+echo =========================================================
+echo.
+echo             BACKUP DO BANCO DE DADOS
+echo.
+echo =========================================================
+echo.
+echo Banco: Teste01
+echo.
+echo Backup sendo realizado...
+echo Aguarde, nao feche esta janela!
+echo.
+
+set "arquivo1=%backupDir1%\nomedoarquivosalvo_%data%_%hora%.sql"
+
+:: Inicia o backup em segundo plano
+start "" /b cmd /c ""%mysqldump%" --defaults-extra-file="%mysqlConfig%" --single-transaction --add-drop-table --databases nome_do_banco > "%arquivo1%""
+
+:: =========================================================
+:: BARRA DE PROGRESSO
+:: =========================================================
+
+set /a progresso=0
+
+:progresso1
+
+:: Verifica se o mysqldump ainda esta executando
+tasklist /FI "IMAGENAME eq mysqldump.exe" 2>nul | find /I "mysqldump.exe" >nul
+
+if errorlevel 1 goto fim_backup1
+
+if !progresso! LSS 99 set /a progresso+=1
+
+cls
+
+echo.
+echo =========================================================
+echo.
+echo             BACKUP DO BANCO DE DADOS
+echo.
+echo =========================================================
+echo.
+echo Banco: Teste01
+echo.
+echo Backup em andamento...
+echo.
+
+set /a cheios=progresso/5
+set /a vazios=20-cheios
+
+set "barra="
+
+for /L %%A in (1,1,!cheios!) do (
+    set "barra=!barra!#"
+)
+
+for /L %%A in (1,1,!vazios!) do (
+    set "barra=!barra!."
+)
+
+echo [!barra!] !progresso!%%
+echo.
+echo Aguarde...
+
+timeout /t 1 /nobreak >nul
+
+goto progresso1
+
+
+:fim_backup1
+
+cls
+
+echo.
+echo =========================================================
+echo.
+echo             BACKUP DO BANCO DE DADOS
+echo.
+echo =========================================================
+echo.
+echo Banco: Teste01
+echo.
+echo [####################] 100%%
+echo.
+echo Backup concluido!
+echo.
+
+timeout /t 2 /nobreak >nul
+
+
+:: =========================================================
+:: BACKUP 2 - Teste02
+:: =========================================================
+
+cls
+
+echo.
+echo =========================================================
+echo.
+echo             BACKUP DO BANCO DE DADOS
+echo.
+echo =========================================================
+echo.
+echo Banco: Test02
+echo.
+echo Backup sendo realizado...
+echo Aguarde, nao feche esta janela!
+echo.
+
+set "arquivo2=%backupDir1%\nomedoarquivosalvo_%data%_%hora%.sql"
+
+:: Inicia o backup em segundo plano
+start "" /b cmd /c ""%mysqldump%" --defaults-extra-file="%mysqlConfig%" --single-transaction --add-drop-table --databases nomedobanco > "%arquivo2%""
+
+:: =========================================================
+:: BARRA DE PROGRESSO
+:: =========================================================
+
+set /a progresso=0
+
+:progresso2
+
+:: Verifica se o mysqldump ainda esta executando
+tasklist /FI "IMAGENAME eq mysqldump.exe" 2>nul | find /I "mysqldump.exe" >nul
+
+if errorlevel 1 goto fim_backup2
+
+if !progresso! LSS 99 set /a progresso+=1
+
+cls
+
+echo.
+echo =========================================================
+echo.
+echo             BACKUP DO BANCO DE DADOS
+echo.
+echo =========================================================
+echo.
+echo Banco: Teste02
+echo.
+echo Backup em andamento...
+echo.
+
+set /a cheios=progresso/5
+set /a vazios=20-cheios
+
+set "barra="
+
+for /L %%A in (1,1,!cheios!) do (
+    set "barra=!barra!#"
+)
+
+for /L %%A in (1,1,!vazios!) do (
+    set "barra=!barra!."
+)
+
+echo [!barra!] !progresso!%%
+echo.
+echo Aguarde...
+
+timeout /t 1 /nobreak >nul
+
+goto progresso2
+
+
+:fim_backup2
+
+cls
+
+echo.
+echo =========================================================
+echo.
+echo             BACKUP DO BANCO DE DADOS
+echo =========================================================
+echo.
+echo Banco: Teste02
+echo.
+echo [####################] 100%%
+echo.
+echo Backup concluido!
+echo.
+
+
+:: =========================================================
+:: FINAL
+:: =========================================================
+
+echo.
+echo =========================================================
+echo.
+echo          BACKUP REALIZADO COM SUCESSO!
+echo.
+echo =========================================================
+echo.
+echo Arquivos salvos em:
+echo %backupDir1%
+echo.
+echo Teste01:
+echo %arquivo1%
+echo.
+echo Teste02:
+echo %arquivo2%
+echo.
+echo =========================================================
+echo.
+
+timeout /t 5 /nobreak >nul
+
+endlocal
+exit
