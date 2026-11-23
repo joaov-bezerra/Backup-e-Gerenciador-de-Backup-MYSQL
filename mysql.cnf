@@ -1,0 +1,4 @@
+[client]
+user=Usuario do mysql
+password=Senha do User mysql
+host=localhost
