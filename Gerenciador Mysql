@@ -1,0 +1,30 @@
+@echo off
+setlocal EnableDelayedExpansion
+
+set "PASTA=C:\coloque em qual pasta esta sendo salvo o Backup do banco"
+
+:VERIFICAR
+
+:: Conta todos os arquivos da pasta
+set "CONT=0"
+
+for /f "delims=" %%F in ('dir "%PASTA%" /b /a-d 2^>nul') do (
+    set /a CONT+=1
+)
+
+echo Total de backups: !CONT!
+
+:: Se tiver 20 ou mais, exclui o mais antigo
+if !CONT! GEQ 20 (
+    echo Existem !CONT! arquivos. Removendo o mais antigo...
+
+    for /f "delims=" %%F in ('dir "%PASTA%" /b /a-d /o:d') do (
+        echo Removendo: %%F
+        del "%PASTA%\%%F"
+        goto VERIFICAR
+    )
+)
+
+echo.
+echo Processo concluido.
+endlocal
